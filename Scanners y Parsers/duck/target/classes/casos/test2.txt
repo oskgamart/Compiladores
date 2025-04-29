@@ -1,0 +1,16 @@
+program p2;
+void suma(a : int, b : float)[
+  var c : float;
+  {c = a + b;
+  print(c);}
+];
+main {
+  x = 1;
+  while (x < 5) do {
+    if (x > 0) {
+      print("positivo");
+    };
+    x = x + 1;
+  };
+}
+end

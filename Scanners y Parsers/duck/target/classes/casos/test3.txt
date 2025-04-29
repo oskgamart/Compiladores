@@ -1,0 +1,8 @@
+program p3;
+void saludar(nombre : int)[
+  {print("Hola");}
+];
+main {
+  saludar(3);
+}
+end

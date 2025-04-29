@@ -1,0 +1,9 @@
+program p4;
+main {
+  a = 3.5;
+  b = a * (2 + 1.5);
+  if (b != 0.0) {
+    print("ok");
+  };
+}
+end

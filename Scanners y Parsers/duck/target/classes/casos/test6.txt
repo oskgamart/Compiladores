@@ -1,0 +1,8 @@
+program p6;
+main {
+  y = 2;
+  if y > 1 {
+    print("fail");
+  };
+}
+end
