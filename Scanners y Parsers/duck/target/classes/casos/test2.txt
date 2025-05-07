@@ -1,5 +1,5 @@
 program p2;
-void suma(a : int, b : float)[
+void p2(a : int, b : float)[
   var c : float;
   {c = a + b;
   print(c);}

@@ -2,6 +2,9 @@ program p3;
 void saludar(nombre : int)[
   {print("Hola");}
 ];
+void hola(nombre : int)[
+  {print("Hola");}
+];
 main {
   saludar(3);
 }

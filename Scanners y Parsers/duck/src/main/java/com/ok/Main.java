@@ -2,8 +2,10 @@ package com.ok;
 
 import com.ok.duckLexer;
 import com.ok.duckParser;
+import com.ok.semantica.SemanticListener;
 
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
 
 import java.io.File;
 import java.io.FileReader;
@@ -22,6 +24,7 @@ public class Main {
 
         for (File archivo : Objects.requireNonNull(archivos)) {
             System.out.println("Analizando: " + archivo.getName());
+
             try {
                 CharStream input = CharStreams.fromReader(new FileReader(archivo));
                 duckLexer lexer = new duckLexer(input);
@@ -39,8 +42,19 @@ public class Main {
                     }
                 });
 
-                parser.programa(); // o la regla de inicio de tu gramática
-                System.out.println("ACEPTADO\n");
+                // ANÁLISIS SINTÁCTICO
+                ParseTree tree = parser.programa();
+
+                // ANÁLISIS SEMÁNTICO
+                SemanticListener listener = new SemanticListener();
+                ParseTreeWalker walker = new ParseTreeWalker();
+                walker.walk(listener, tree);
+
+                System.out.println("ACEPTADO");
+                System.out.println("Directorio de Funciones:");
+                System.out.println(listener.getDirectorio());
+                System.out.println();
+
             } catch (Exception e) {
                 System.out.println("RECHAZADO: " + e.getMessage() + "\n");
             }

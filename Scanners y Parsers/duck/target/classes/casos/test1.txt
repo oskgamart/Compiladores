@@ -1,6 +1,11 @@
 program p1;
 var x, y : int;
 z : float;
+void suma(a : int, x : int)[
+  var h : float;
+  {c = a + b;
+  print(c);}
+];
 main {
   x = 5;
   print(x);
