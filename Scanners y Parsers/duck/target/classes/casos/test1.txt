@@ -2,7 +2,7 @@ program p1;
 var x, y : int;
 z : float;
 void suma(a : int, x : int)[
-  var h : float;
+  var b, c : float;
   {c = a + b;
   print(c);}
 ];

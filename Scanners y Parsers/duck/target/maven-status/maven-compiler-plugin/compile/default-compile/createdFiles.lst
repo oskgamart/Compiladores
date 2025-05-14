@@ -1,6 +1,5 @@
 com\ok\duckParser$CycleContext.class
 com\ok\duckParser$M_f_call_expresionContext.class
-duckLexer.tokens
 com\ok\duckParser$StatementContext.class
 com\ok\duckParser$FuncArgumentsContext.class
 com\ok\duckParser$MultiplePrintContext.class
@@ -9,7 +8,6 @@ com\ok\duckParser$VarDefContext.class
 com\ok\semantica\Variable.class
 com\ok\duckParser$FactorContext.class
 com\ok\App.class
-com\ok\duckLexer.class
 com\ok\duckParser$PrintExpresionContext.class
 com\ok\duckBaseListener.class
 com\ok\duckParser$TypeContext.class
@@ -18,10 +16,8 @@ com\ok\duckParser$TerminoFinalContext.class
 com\ok\semantica\Funcion.class
 com\ok\duckParser.class
 com\ok\duckParser$VarsContext.class
-com\ok\duckLexer.interp
 com\ok\duckParser$MultipleFuncArgumentsContext.class
 com\ok\duckParser$ExpFinalContext.class
-com\ok\duck.interp
 com\ok\semantica\DirectorioFunciones.class
 com\ok\duckParser$ElsePartContext.class
 com\ok\duckParser$ExpresionContext.class
@@ -40,6 +36,8 @@ com\ok\duckParser$F_callContext.class
 com\ok\duckParser$VarDefIDContext.class
 com\ok\duckParser$MultipleVarContext.class
 com\ok\duckParser$ProgramaContext.class
+com\ok\generacion\Memoria.class
 duck.tokens
 com\ok\duckParser$Id_cteContext.class
+com\ok\generacion\Cuadruplo.class
 com\ok\duckParser$ExpContext.class

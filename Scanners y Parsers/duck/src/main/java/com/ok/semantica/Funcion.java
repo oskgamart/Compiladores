@@ -22,10 +22,10 @@ public class Funcion {
                 '}';
     }
 
-    public void agregarVariable(String nombre, String tipo, String contexto) {
+    public void agregarVariable(String nombre, String tipo, int direccion, String contexto) {
         if (tablaVariables.containsKey(nombre)) {
             throw new RuntimeException("Variable '" + nombre + "' ya fue declarada en " + contexto);
         }
-        tablaVariables.put(nombre, new Variable(tipo));
+        tablaVariables.put(nombre, new Variable(tipo, direccion));
     }
 }

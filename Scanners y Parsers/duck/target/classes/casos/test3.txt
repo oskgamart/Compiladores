@@ -1,11 +1,13 @@
 program p3;
+var nombre, apellido : int;
 void saludar(nombre : int)[
   {print("Hola");}
 ];
-void hola(nombre : int)[
+void hola(apellido : int)[
   {print("Hola");}
 ];
 main {
-  saludar(3);
+  nombre = nombre + apellido;
+  print("HOLA");
 }
 end

@@ -3,13 +3,14 @@ package com.ok;
 import com.ok.duckLexer;
 import com.ok.duckParser;
 import com.ok.semantica.SemanticListener;
+import com.ok.generacion.Cuadruplo;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 
 public class Main {
@@ -53,6 +54,12 @@ public class Main {
                 System.out.println("ACEPTADO");
                 System.out.println("Directorio de Funciones:");
                 System.out.println(listener.getDirectorio());
+
+                System.out.println("\n Cuádruplos Generados:");
+                List<Cuadruplo> cuadruplos = listener.getCuadruplos();
+                for (int i = 0; i < cuadruplos.size(); i++) {
+                    System.out.println(i + ": " + cuadruplos.get(i));
+                }
                 System.out.println();
 
             } catch (Exception e) {

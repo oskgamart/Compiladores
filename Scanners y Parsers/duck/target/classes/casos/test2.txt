@@ -1,4 +1,5 @@
 program p2;
+var x : int;
 void p2(a : int, b : float)[
   var c : float;
   {c = a + b;
