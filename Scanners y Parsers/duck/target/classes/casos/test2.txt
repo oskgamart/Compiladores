@@ -1,12 +1,17 @@
 program p2;
 var x : int;
-void p2(a : int, b : float)[
+void p1(a : int, b : float)[
   var c : float;
   {c = a + b;
   print(c);}
 ];
+
+void p3(a : int, b : int, c : int, z: int)[
+  {c = a+b+c*z;}
+];
+
 main {
-  x = 1;
+  x = -1;
   while (x < 5) do {
     if (x > 0) {
       print("positivo");
