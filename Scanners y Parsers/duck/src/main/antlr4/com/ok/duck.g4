@@ -47,7 +47,8 @@ varDef : ID varDefID COLON type SEMICOLON multipleVar ;
 varDefID : COMMA ID varDefID | ;
 multipleVar : varDef | ;
 
-funcs : VOID ID LPAREN funcArguments RPAREN LBRACKET vars body RBRACKET SEMICOLON funcs | ;
+funcs : (func)* ;
+func : VOID ID LPAREN funcArguments RPAREN LBRACKET vars body RBRACKET SEMICOLON ;
 funcArguments : ID COLON type multipleFuncArguments | ;
 multipleFuncArguments : COMMA funcArguments | ;
 

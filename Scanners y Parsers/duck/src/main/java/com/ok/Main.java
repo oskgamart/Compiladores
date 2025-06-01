@@ -55,6 +55,7 @@ public class Main {
                 System.out.println("Directorio de Funciones:");
                 System.out.println(listener.getDirectorio());
 
+
                 System.out.println("\n Cuádruplos Generados:");
                 List<Cuadruplo> cuadruplos = listener.getCuadruplos();
                 for (int i = 0; i < cuadruplos.size(); i++) {

@@ -68,6 +68,16 @@ public interface duckListener extends ParseTreeListener {
 	 */
 	void exitFuncs(duckParser.FuncsContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link duckParser#func}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunc(duckParser.FuncContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link duckParser#func}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunc(duckParser.FuncContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link duckParser#funcArguments}.
 	 * @param ctx the parse tree
 	 */

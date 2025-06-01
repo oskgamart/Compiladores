@@ -1,22 +1,18 @@
 program p2;
-var x : int;
-void p1(a : int, b : float)[
-  var c : float;
-  {c = a + b;
-  print(c);}
-];
-
-void p3(a : int, b : int, c : int, z: int)[
-  {c = a+b+c*z;}
-];
+var x, c, d, e, f : int;
 
 main {
-  x = -1;
-  while (x < 5) do {
-    if (x > 0) {
-      print("positivo");
+  print("Serie Fibonacci en Main");
+  x = 8;
+  c = 0;
+  d = 0;
+  e = 1;
+  while(c<x) do {
+      print(d)
+      f = d;
+      d = d + e;
+      e = f;
+      c = c + 1;
     };
-    x = x + 1;
-  };
 }
 end

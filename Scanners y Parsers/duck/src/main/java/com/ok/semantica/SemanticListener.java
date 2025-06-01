@@ -5,6 +5,7 @@ import com.ok.duckParser;
 import com.ok.generacion.Cuadruplo;
 import com.ok.generacion.Memoria;
 import com.ok.semantica.CuboSemantico;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.*;
 
@@ -20,15 +21,28 @@ public class SemanticListener extends duckBaseListener {
     private final Stack<String> pilaTipos = new Stack<>();
     private final Stack<Integer> pilaSaltos = new Stack<>();
     private final Map<String, Integer> tablaConstantes = new HashMap<>();
+    private final Map<String, Integer> inicioFunciones = new HashMap<>();
 
     private String funcionActual = "global";
     private String nombrePrograma = null;
 
     @Override
     public void enterPrograma(duckParser.ProgramaContext ctx) {
-        nombrePrograma = ctx.ID().getText();
+        nombrePrograma = ctx.ID().getText(); 
+        cuadruplos.add(new Cuadruplo("GOTO", -1, -1, -1));
         directorio.agregarFuncion("global", "void");
         funcionActual = "global";
+        
+       
+    }  
+
+    @Override
+    public void enterBody(duckParser.BodyContext ctx) {
+        // Si el padre es `programa` y estamos entrando a `main`
+        if (ctx.getParent() instanceof duckParser.ProgramaContext) {
+            // Este body es el de main → completamos el primer GOTO
+            cuadruplos.get(0).resultado = cuadruplos.size();
+        }
     }
 
     @Override
@@ -49,12 +63,12 @@ public class SemanticListener extends duckBaseListener {
     }
 
     @Override
-    public void enterFuncs(duckParser.FuncsContext ctx) {
+    public void enterFunc(duckParser.FuncContext ctx) {
         if (ctx.ID() == null) return;
 
         String nombreFuncion = ctx.ID().getText();
-
-
+        
+        
         if (directorio.existeFuncion(nombreFuncion)) {
             throw new RuntimeException("Función duplicada: '" + nombreFuncion + "'");
         }
@@ -62,9 +76,13 @@ public class SemanticListener extends duckBaseListener {
         directorio.agregarFuncion(nombreFuncion, "void");
         funcionActual = nombreFuncion;
 
+        Funcion f = directorio.obtenerFuncion(nombreFuncion);
+        f.inicio = cuadruplos.size();
+
         if (ctx.funcArguments() != null) {
             procesarArgumentos(ctx.funcArguments(), directorio.obtenerFuncion(nombreFuncion));
         }
+
     }
 
     private void procesarArgumentos(duckParser.FuncArgumentsContext ctx, Funcion f) {
@@ -96,9 +114,58 @@ public class SemanticListener extends duckBaseListener {
     }
 
     @Override
-    public void exitFuncs(duckParser.FuncsContext ctx) {
+    public void exitFunc(duckParser.FuncContext ctx) {
+        // ENDF y almacenamiento de memoria usados por la función
+        
+        Funcion f = directorio.obtenerFuncion(funcionActual);
+
+        f.localInt = memoria.getContador("local", "int");
+        f.localFloat = memoria.getContador("local", "float");
+        f.tempInt = memoria.getContador("temp", "int");
+        f.tempFloat = memoria.getContador("temp", "float");
+        f.tempBool = memoria.getContador("temp", "bool");
+
+        cuadruplos.add(new Cuadruplo("ENDF", -1, -1, funcionActual.hashCode()));
+        memoria.resetearLocales();
         funcionActual = "global";
+        
     }
+
+
+    @Override
+    public void exitF_call(duckParser.F_callContext ctx) {
+        String nombreFuncion = ctx.ID().getText();
+
+        if (!directorio.existeFuncion(nombreFuncion)) {
+            throw new RuntimeException("Función no declarada: " + nombreFuncion);
+        }
+
+        Funcion f = directorio.obtenerFuncion(nombreFuncion);
+
+        cuadruplos.add(new Cuadruplo("ERA", -1, -1, nombreFuncion.hashCode()));
+
+        List<String> nombresParametros = new ArrayList<>(f.tablaVariables.keySet())
+        .subList(0, f.parametros.size());
+
+        // Asume que ya apilaste los parámetros como operandos
+        for (int i = f.parametros.size() - 1; i >= 0; i--) {
+            int valorDir = pilaOperandos.pop();
+            String tipoArg = pilaTipos.pop();
+
+            String tipoEsperado = f.parametros.get(i);
+            if (!tipoEsperado.equals(tipoArg)) {
+                throw new RuntimeException("Tipo de parámetro incorrecto para función " + nombreFuncion);
+            }
+
+            String nombreParam = nombresParametros.get(i);
+            int dirDestino = f.tablaVariables.get(nombreParam).direccion;
+
+            cuadruplos.add(new Cuadruplo("PARAM", valorDir, -1, dirDestino));
+        }
+
+        cuadruplos.add(new Cuadruplo("GOSUB", -1, -1, nombreFuncion.hashCode()));
+    }
+
 
     // --------------------- PILAS Y CUÁDRUPLOS ---------------------
 
@@ -165,7 +232,10 @@ public class SemanticListener extends duckBaseListener {
 
     @Override
     public void exitExpresionFinal(duckParser.ExpresionFinalContext ctx) {
-        if (ctx.GT() != null || ctx.LT() != null || ctx.NE() != null) generarCuadruploBinario();
+
+        if (ctx.GT() != null || ctx.LT() != null || ctx.NE() != null) {
+            generarCuadruploBinario();
+        }
     }
 
     private void generarCuadruploBinario() {
@@ -231,22 +301,33 @@ public class SemanticListener extends duckBaseListener {
         }
     }
 
-    private int precedencia(String operador) {
-    switch (operador) {
-        case "*":
-        case "/":
-            return 3;
-        case "+":
-        case "-":
-            return 2;
-        case ">":
-        case "<":
-        case "!=":
-            return 1;
-        default:
-            return 0; // operadores desconocidos o de control
+    @Override
+    public void exitPrograma(duckParser.ProgramaContext ctx) {
+        Funcion f = directorio.obtenerFuncion("global");
+
+        f.localInt = memoria.getContador("global", "int");
+        f.localFloat = memoria.getContador("global", "float");
+        // No se asignan temporales a global
+
+
     }
-}
+
+    private int precedencia(String operador) {
+        switch (operador) {
+            case "*":
+            case "/":
+                return 3;
+            case "+":
+            case "-":
+                return 2;
+            case ">":
+            case "<":
+            case "!=":
+                return 1;
+            default:
+                return 0; // operadores desconocidos o de control
+        }
+    }
 
 
     @Override
@@ -260,20 +341,48 @@ public class SemanticListener extends duckBaseListener {
             generarCuadruploBinario();
         }
 
-        // Verifica si estamos en un contexto de control
-        if (ctx.getParent() instanceof duckParser.ConditionContext || ctx.getParent() instanceof duckParser.CycleContext) {
-            int resultadoCond = pilaOperandos.pop();
-            String tipo = pilaTipos.pop();
+        ParseTree padre = ctx.getParent();
 
-            if (!tipo.equals("bool")) {
-                throw new RuntimeException("La condición debe ser booleana, no: " + tipo);
+        if (padre instanceof duckParser.ConditionContext) {
+            duckParser.ConditionContext condition = (duckParser.ConditionContext) padre;
+            if (condition.expresion() == ctx) {
+                if (pilaOperandos.isEmpty() || pilaTipos.isEmpty()) {
+                    throw new RuntimeException("Expresión mal formada en condición.");
+                }
+
+                int resultadoCond = pilaOperandos.pop();
+                String tipo = pilaTipos.pop();
+
+                if (!tipo.equals("bool")) {
+                    throw new RuntimeException("Condición debe ser booleana, no: " + tipo);
+                }
+
+                cuadruplos.add(new Cuadruplo("GOTOF", resultadoCond, -1, -1));
+                pilaSaltos.push(cuadruplos.size() - 1);
             }
+        }
 
-            // GOTO FALSO (condicional)
-            cuadruplos.add(new Cuadruplo("GOTOF", resultadoCond, -1, -1));
-            pilaSaltos.push(cuadruplos.size() - 1); // índice del GOTOF a rellenar
+        if (padre instanceof duckParser.CycleContext) {
+            duckParser.CycleContext cycle = (duckParser.CycleContext) padre;
+            if (cycle.expresion() == ctx) {
+                if (pilaOperandos.isEmpty() || pilaTipos.isEmpty()) {
+                    throw new RuntimeException("Expresión mal formada en ciclo.");
+                }
+
+                int resultadoCond = pilaOperandos.pop();
+                String tipo = pilaTipos.pop();
+
+                if (!tipo.equals("bool")) {
+                    throw new RuntimeException("Condición debe ser booleana, no: " + tipo);
+                }
+
+                cuadruplos.add(new Cuadruplo("GOTOF", resultadoCond, -1, -1));
+                pilaSaltos.push(cuadruplos.size() - 1);
+            }
         }
     }
+
+
 
     @Override
     public void exitCycle(duckParser.CycleContext ctx) {
@@ -287,24 +396,31 @@ public class SemanticListener extends duckBaseListener {
 
     @Override
     public void exitCondition(duckParser.ConditionContext ctx) {
-        if (ctx.elsePart().body() != null) {
-            // Hay un else → genera salto incondicional
+        if (pilaSaltos.isEmpty()) {
+            throw new RuntimeException("Falta GOTOF para condición.");
+        }
+
+        int gotofIndex = pilaSaltos.pop();
+
+        // Si hay un else, no completamos aquí el salto todavía
+        if (ctx.elsePart().ELSE() != null) {
             cuadruplos.add(new Cuadruplo("GOTO", -1, -1, -1));
             int gotoFinal = cuadruplos.size() - 1;
 
-            int gotof = pilaSaltos.pop(); // GOTOF condicional
-            cuadruplos.get(gotof).resultado = gotof + 1;
-
-            pilaSaltos.push(gotoFinal); // GOTO final (después del else)
+            cuadruplos.get(gotofIndex).resultado = cuadruplos.size(); // salta al else
+            pilaSaltos.push(gotoFinal); // lo completamos en exitElsePart
         } else {
-            int gotof = pilaSaltos.pop();
-            cuadruplos.get(gotof).resultado = cuadruplos.size(); // no hay else
+            cuadruplos.get(gotofIndex).resultado = cuadruplos.size();
         }
     }
+
 
     @Override
     public void exitElsePart(duckParser.ElsePartContext ctx) {
         if (ctx.ELSE() != null) {
+            if (pilaSaltos.isEmpty()) {
+                throw new RuntimeException("Falta GOTO final para else.");
+            }
             int gotoFinal = pilaSaltos.pop();
             cuadruplos.get(gotoFinal).resultado = cuadruplos.size();
         }
@@ -346,4 +462,39 @@ public class SemanticListener extends duckBaseListener {
     public List<Cuadruplo> getCuadruplos() {
         return cuadruplos;
     }
+
+
+    public Map<Integer, Object> getTablaConstantes() {
+        return convertirConstantesParaVM(tablaConstantes);
+    }
+
+
+    public Map<Integer, Object> convertirConstantesParaVM(Map<String, Integer> tablaConstantes) {
+        Map<Integer, Object> memoriaConstantes = new HashMap<>();
+
+        for (Map.Entry<String, Integer> entrada : tablaConstantes.entrySet()) {
+            String valorOriginal = entrada.getKey();
+            Integer direccion = entrada.getValue();
+
+            Object valorConvertido;
+            if (valorOriginal.startsWith("\"") && valorOriginal.endsWith("\"")) {
+                valorConvertido = valorOriginal.substring(1, valorOriginal.length() - 1); // quitar comillas
+            } else if (valorOriginal.contains(".")) {
+                valorConvertido = Double.parseDouble(valorOriginal);
+            } else if (valorOriginal.equals("true") || valorOriginal.equals("false")) {
+                valorConvertido = Boolean.parseBoolean(valorOriginal);
+            } else {
+                try {
+                    valorConvertido = Integer.parseInt(valorOriginal);
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException("No se pudo convertir constante: " + valorOriginal);
+                }
+            }
+
+            memoriaConstantes.put(direccion, valorConvertido);
+        }
+        System.out.println(memoriaConstantes);
+        return memoriaConstantes;
+    }
+
 }
