@@ -16,7 +16,7 @@ import java.util.*;
 
 public class Main2 {
     public static void main(String[] args) throws Exception {
-        File archivo = new File("src/main/resources/casos/test2.txt");
+        File archivo = new File("src/main/resources/casos/test5.txt");
         CharStream input = CharStreams.fromReader(new FileReader(archivo));
         duckLexer lexer = new duckLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -34,12 +34,12 @@ public class Main2 {
         DirectorioFunciones directorio = listener.getDirectorio();
         Map<Integer, Object> memoriaConstante = listener.getTablaConstantes();
 
-        System.out.println("=== CUÁDRUPLOS ===");
+        /* System.out.println("=== CUÁDRUPLOS ===");
         for (int i = 0; i < cuadruplos.size(); i++) {
             System.out.println(i + ": " + cuadruplos.get(i));
-        }
+        } */
 
-        System.out.println("\n=== EJECUCIÓN ===");
+        System.out.println("\n=== EJECUCION ===");
         VirtualMachine vm = new VirtualMachine(cuadruplos, directorio, memoriaConstante);
         vm.run();
     }

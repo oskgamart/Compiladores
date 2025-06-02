@@ -21,7 +21,6 @@ public class SemanticListener extends duckBaseListener {
     private final Stack<String> pilaTipos = new Stack<>();
     private final Stack<Integer> pilaSaltos = new Stack<>();
     private final Map<String, Integer> tablaConstantes = new HashMap<>();
-    private final Map<String, Integer> inicioFunciones = new HashMap<>();
 
     private String funcionActual = "global";
     private String nombrePrograma = null;
@@ -33,7 +32,6 @@ public class SemanticListener extends duckBaseListener {
         directorio.agregarFuncion("global", "void");
         funcionActual = "global";
         
-       
     }  
 
     @Override
@@ -147,7 +145,6 @@ public class SemanticListener extends duckBaseListener {
         List<String> nombresParametros = new ArrayList<>(f.tablaVariables.keySet())
         .subList(0, f.parametros.size());
 
-        // Asume que ya apilaste los parámetros como operandos
         for (int i = f.parametros.size() - 1; i >= 0; i--) {
             int valorDir = pilaOperandos.pop();
             String tipoArg = pilaTipos.pop();
@@ -493,7 +490,7 @@ public class SemanticListener extends duckBaseListener {
 
             memoriaConstantes.put(direccion, valorConvertido);
         }
-        System.out.println(memoriaConstantes);
+        
         return memoriaConstantes;
     }
 

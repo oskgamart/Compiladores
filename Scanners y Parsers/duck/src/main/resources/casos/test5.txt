@@ -1,6 +1,22 @@
 program p5;
-main {
-  x = 10
-  print(x);
+var x, y : int;
+void mayor(a: int, b: int)[
+  var c : int;
+  {
+    if(a>b){
+     print("El primer numero es mayor");
+     if(a<5){
+      print("El primer numero es menor a 5");
+     };
+    };
+    if(a<b){
+     print("El segundo numero es mayor");
+    };
+  }
+];
+main{
+  x = 4;
+  y = 3;
+  mayor(x,y);
 }
 end

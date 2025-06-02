@@ -6,7 +6,6 @@ public class Funcion {
     public final String tipoRetorno; // siempre es void
     public final Map<String, Variable> tablaVariables;
     public final List<String> parametros;
-    public final List<String> espacio;
     public int localInt = 0;
     public int localFloat = 0;
     public int tempInt = 0;
@@ -18,8 +17,6 @@ public class Funcion {
         this.tipoRetorno = tipoRetorno;
         this.tablaVariables = new HashMap<>();
         this.parametros = new ArrayList<>();
-        this.espacio = new ArrayList<>();
-        
     }
 
     @Override

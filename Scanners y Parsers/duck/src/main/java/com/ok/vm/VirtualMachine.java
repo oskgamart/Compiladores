@@ -11,7 +11,6 @@ public class VirtualMachine {
     private final Map<Integer, Object> memoriaGlobal = new HashMap<>();
     private final Map<Integer, Object> memoriaConstantes;
     private final DirectorioFunciones directorio;
-    private final Map<String, Integer> inicioFunciones = new HashMap<>();
 
     private final Stack<Map<Integer, Object>> pilaMemoriaLocal = new Stack<>();
     private final Stack<Map<Integer, Object>> pilaMemoriaTemporal = new Stack<>();
@@ -184,8 +183,6 @@ public class VirtualMachine {
             default:
                 throw new RuntimeException("Tipo de memoria no soportado: " + tipo);
         }
-        
-
         
         
     }

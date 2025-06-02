@@ -8,7 +8,7 @@ main {
   d = 0;
   e = 1;
   while(c<x) do {
-      print(d)
+      print(d);
       f = d;
       d = d + e;
       e = f;

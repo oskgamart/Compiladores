@@ -1,13 +1,22 @@
 program p3;
-var nombre, apellido : int;
-void saludar(nombre : int)[
-  {print("Hola");}
-];
-void hola(apellido : int)[
-  {print("Hola");}
+var x, y, k : int;
+void factorial()[
+  var c, d, e, f : int;
+  {
+    c = 0;
+    d = x;
+    e = 1;
+    while(c<x) do {
+      e = d * e;
+      d = d - 1;
+      c = c + 1;
+    };
+    print(e);
+  }
 ];
 main {
-  nombre = nombre + apellido;
-  print("HOLA");
+  x = 8;
+  print("Factorial en Funcion");
+  factorial();
 }
 end
